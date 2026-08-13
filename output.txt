@@ -1,0 +1,41 @@
+
+=== Health check (GET /api/health) ===
+GET /api/health -> 200 {"status":"ok"}
+
+=== Initial task list (should be empty) ===
+GET /api/tasks -> 200 []
+
+=== Reject a task with no title (validation) ===
+POST /api/tasks {} -> 400 {"error":"title is required"}
+
+=== Create three tasks ===
+POST /api/tasks {title:"Set up Azure Web App"} -> 201 {"_id":"demo-000001","title":"Set up Azure Web App","done":false,"createdAt":1786663195895,"updatedAt":1786663195895}
+POST /api/tasks {title:"Connect MongoDB Atlas"} -> 201 {"_id":"demo-000002","title":"Connect MongoDB Atlas","done":false,"createdAt":1786663195898,"updatedAt":1786663195898}
+POST /api/tasks {title:"Deploy via GitHub continuous integration"} -> 201 {"_id":"demo-000003","title":"Deploy via GitHub continuous integration","done":false,"createdAt":1786663195902,"updatedAt":1786663195902}
+
+=== List tasks after creation ===
+GET /api/tasks -> 200 (3 tasks)
+  - [ ] Set up Azure Web App (demo-000001)
+  - [ ] Connect MongoDB Atlas (demo-000002)
+  - [ ] Deploy via GitHub continuous integration (demo-000003)
+
+=== Mark the first task as done ===
+PUT /api/tasks/demo-000001 {done:true} -> 200 {"_id":"demo-000001","title":"Set up Azure Web App","done":true,"createdAt":1786663195895,"updatedAt":1786663195907}
+
+=== Delete the second task ===
+DELETE /api/tasks/demo-000002 -> 200 {"deleted":true,"id":"demo-000002"}
+
+=== Update a task that no longer exists (404 case) ===
+PUT /api/tasks/demo-000002 -> 404 {"error":"task not found"}
+
+=== Final task list ===
+GET /api/tasks -> 200 (2 tasks)
+  - [x] Set up Azure Web App (demo-000001)
+  - [ ] Deploy via GitHub continuous integration (demo-000003)
+
+=== Non-API route falls back to the SPA (catch-all route) ===
+GET /some/client/side/route -> 200
+MERN backend is running. Run "npm run build" in /client to serve the React app from here.
+
+=== Done ===
+In production, server.js connects this same app.js to MongoDB Atlas via MONGODB_URI and is deployed on Azure App Service (see README.md).
